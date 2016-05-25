@@ -4,6 +4,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"net/http"
 	"strings"
 )
 
@@ -11,6 +12,25 @@ import (
 type ApigeeJWTToken struct {
 	originalToken string
 	tokenPayload  tokenPayload
+}
+
+//NewApigeeJWTTokenFromRequest create and return our JWTToken impl from the http request
+func NewApigeeJWTTokenFromRequest(r *http.Request) (JWTToken, error) {
+	header := r.Header.Get("Authorization")
+
+	if header == "" {
+		return nil, fmt.Errorf("No 'Authorization' header was found in the request")
+	}
+
+	sections := strings.Fields(header)
+
+	if len(sections) != 2 {
+		return nil, fmt.Errorf("Expected the authorization header to have the format of 'Bearer JWTTOKEN'")
+	}
+
+	//if we get here, we have a Bearer token
+
+	return NewApigeeJWTToken(sections[1])
 }
 
 //NewApigeeJWTToken create a new Apigee JWT token.  Return the instance or an error if one cannot be created
