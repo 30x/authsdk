@@ -2,6 +2,7 @@ package authsdk
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -45,6 +46,11 @@ func (token *ApigeeJWTToken) IsOrgAdmin(orgName string) (bool, error) {
 		}
 
 		defer response.Body.Close()
+
+		if response.StatusCode != http.StatusOK {
+			return false, errors.New("You did not provide a valid apigee JWT token")
+		}
+
 		body, err := ioutil.ReadAll(response.Body)
 
 		if err != nil {
@@ -73,6 +79,7 @@ func (token *ApigeeJWTToken) IsOrgAdmin(orgName string) (bool, error) {
 		if err != nil {
 			return false, err
 		}
+
 		token.roles = roles
 
 	}
