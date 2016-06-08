@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"os"
 )
 
 //ApigeeJWTToken the apigee impelmentation of the JWT token auth sdk
@@ -13,6 +14,18 @@ type ApigeeJWTToken struct {
 	tokenPayload
 	//the cached roles, can be nill if not set
 	roles *roles
+}
+
+var apiBase string
+
+func init() {
+	envVar := os.Getenv("AUTH_API_HOST")
+
+	if envVar == "" {
+		apiBase = "api.enterprise.apigee.com"
+	} else {
+		apiBase = envVar
+	}
 }
 
 //NewApigeeJWTToken create a new Apigee JWT token.  Return the instance or an error if one cannot be created
@@ -33,7 +46,7 @@ func (token *ApigeeJWTToken) IsOrgAdmin(orgName string) (bool, error) {
 	//we haven't pulled the roles and cache them, go get them
 	if token.roles == nil {
 
-		url := fmt.Sprintf("https://api.enterprise.apigee.com/v1/users/%s/userroles", token.GetUsername())
+		url := fmt.Sprintf("https://%s/v1/users/%s/userroles", apiBase, token.GetUsername())
 
 		req, err := http.NewRequest("GET", url, nil)
 		req.Header.Add("Accept", "application/json")
