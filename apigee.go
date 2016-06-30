@@ -46,7 +46,7 @@ func (token *ApigeeJWTToken) IsOrgAdmin(orgName string) (bool, error) {
 	//we haven't pulled the roles and cache them, go get them
 	if token.roles == nil {
 
-		url := fmt.Sprintf("https://%s/v1/users/%s/userroles", apiBase, token.GetUsername())
+		url := fmt.Sprintf("https://%s/v1/users/%s/userroles", apiBase, token.GetUsernameURLSafe())
 
 		req, err := http.NewRequest("GET", url, nil)
 		req.Header.Add("Accept", "application/json")
