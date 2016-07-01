@@ -4,7 +4,6 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"net/url"
 	"strings"
 )
 
@@ -62,11 +61,6 @@ func (token *tokenPayload) GetSubject() string {
 //GetUsername return the username if possible for the subject
 func (token *tokenPayload) GetUsername() string {
 	return token.Username
-}
-
-//GetUsername return the username if possible for the subject
-func (token *tokenPayload) GetUsernameURLSafe() string {
-	return url.QueryEscape(token.Username)
 }
 
 //GetEmail return the username if possible for the subject
