@@ -21,7 +21,8 @@ const (
 type ApigeeJWTToken struct {
 	tokenPayload
 	//the cached roles, can be nill if not set
-	roles *roles
+	roles  *roles
+	client *http.Client
 }
 
 var apiBase string
@@ -36,7 +37,7 @@ func init() {
 }
 
 //NewApigeeJWTToken create a new Apigee JWT token.  Return the instance or an error if one cannot be created
-func NewApigeeJWTToken(token string) (JWTToken, error) {
+func NewApigeeJWTToken(token string, c *http.Client) (JWTToken, error) {
 
 	parsedToken, err := parseToken(token)
 
@@ -44,7 +45,7 @@ func NewApigeeJWTToken(token string) (JWTToken, error) {
 		return nil, err
 	}
 
-	return &ApigeeJWTToken{tokenPayload: *parsedToken}, nil
+	return &ApigeeJWTToken{tokenPayload: *parsedToken, client: c}, nil
 }
 
 //IsOrgAdmin is the current JWTToken subject an organization admin.  If so return true, if not, return false.  An error is returned if the check cannot be performed
@@ -58,8 +59,7 @@ func (token *ApigeeJWTToken) IsOrgAdmin(orgName string) (bool, error) {
 		req, err := http.NewRequest("GET", url, nil)
 		req.Header.Add("Accept", "application/json")
 		req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", token.EncodedToken))
-		client := &http.Client{}
-		response, err := client.Do(req)
+		response, err := token.client.Do(req)
 
 		if err != nil {
 			return false, err
