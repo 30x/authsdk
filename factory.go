@@ -8,7 +8,7 @@ import (
 )
 
 //NewJWTToken creates a new JWT token based on the environment configuration
-func NewJWTToken(token string) (JWTToken, error) {
+func NewJWTToken(token string, c *http.Client) (JWTToken, error) {
 
 	impl := os.Getenv("JWTTOKENIMPL")
 
@@ -16,13 +16,13 @@ func NewJWTToken(token string) (JWTToken, error) {
 	case "test":
 		return NewTestToken(token)
 	default:
-		return NewApigeeJWTToken(token)
+		return NewApigeeJWTToken(token, c)
 	}
 
 }
 
 //NewJWTTokenFromRequest create and return our JWTToken impl from the http request
-func NewJWTTokenFromRequest(r *http.Request) (JWTToken, error) {
+func NewJWTTokenFromRequest(r *http.Request, c *http.Client) (JWTToken, error) {
 	header := r.Header.Get("Authorization")
 
 	if header == "" {
@@ -37,5 +37,5 @@ func NewJWTTokenFromRequest(r *http.Request) (JWTToken, error) {
 
 	//if we get here, we have a Bearer token
 
-	return NewJWTToken(sections[1])
+	return NewJWTToken(sections[1], c)
 }

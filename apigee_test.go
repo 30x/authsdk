@@ -4,6 +4,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
+	"net/http"
 	"os"
 )
 
@@ -15,7 +16,7 @@ var _ = Describe("Apigee", func() {
 
 		Expect(testToken).ShouldNot(BeNil(), "TEST_APIGEE_TOKEN must be defined in the environment to execute this test")
 
-		jwtToken, err := NewApigeeJWTToken(testToken)
+		jwtToken, err := NewApigeeJWTToken(testToken, http.DefaultClient)
 
 		Expect(err).Should(BeNil(), "Should not return an error creating a valid token")
 
